@@ -11,6 +11,10 @@ const signToken = (id) => {
 const createandSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
 
+  res.cookie("jwt", token, {
+    htppOnly: true,
+    maxAge: new Date(Date.now() + process.env.JWT_EXPIRES_IN),
+  });
   user.password = undefined;
 
   res.status(statusCode).json({
@@ -68,4 +72,9 @@ exports.login = async (req, res, next) => {
   }
 
   createandSendToken(user, 200, res);
+};
+
+exports.logout = async (req, res, next) => {
+  res.cookie("jwt", "", { maxAge: 1 });
+  res.redirect("/");
 };
